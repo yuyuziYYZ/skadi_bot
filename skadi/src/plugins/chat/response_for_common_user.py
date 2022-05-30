@@ -64,16 +64,14 @@ async def get_response_for_common_user(bot, chat, msg, user_id, group_id, defaul
             return choice(responses)
         
         # 发送多条信息并且在过程中休眠
-        if "自爆" in msg:
-            await chat.send("听你的。")
+        if "撒撒给呦" in msg:
+            await chat.send("撒撒给呦~")
             await asyncio.sleep(1)
-            await chat.send("3")
+            await chat.send("心脏~")
             await asyncio.sleep(1)
-            await chat.send("2")
+            await chat.send("撒撒给呦~")
             await asyncio.sleep(1)
-            await chat.send("1")
-            await asyncio.sleep(1)
-            return r'诶嘿，我才不爆'
+            return r'为斯卡蒂！献上心脏！'
 
     # 添加响应概率不同的事件
     if (cool_down(group_id) and random_response(p=20)) or is_super_user:

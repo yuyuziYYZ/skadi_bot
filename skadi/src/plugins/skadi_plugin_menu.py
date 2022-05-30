@@ -1,3 +1,5 @@
+from email.mime import image
+from importlib.resources import path
 from pathlib import Path
 
 from nonebot.adapters.onebot.v11 import MessageSegment
@@ -14,3 +16,4 @@ async def handle_local_menu():
     image = MessageSegment.image(path)
     # 发送图片
     await local_menu.finish(image)
+
