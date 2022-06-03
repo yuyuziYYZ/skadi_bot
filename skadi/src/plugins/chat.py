@@ -129,10 +129,8 @@ async def handle_first_receive(bot: Bot, event: Event, state: T_State):
             _, group_id, user_id = event.get_session_id().split("_")
             description = event.get_event_description()
             values = json.loads(description.replace("'", '"'))
-            bot_id = "2133541714"
-            super_uid = ["2674367570"]
-            p_poke_response = 100
-            default_ban_time = 60
+            bot_id = "123456789"
+            super_uid = ["123456789"]
             # 如果被戳的是机器人
             if values['notice_type'] == 'notify' and values['sub_type'] == 'poke' and str(
                     values['target_id']) == bot_id:
