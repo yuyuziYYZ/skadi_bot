@@ -1,9 +1,13 @@
 from ast import alias
+import json
 from random import choice
 import re
 from urllib import response
-from nonebot import on_command
+from nonebot import on_command,on_keyword,on_notice
 from nonebot.adapters.onebot.v11 import Bot, Event, Message
+from nonebot.typing import T_State
+from time import time
+from random import randint
 
 #蒂蒂的聊天插件，采用comman触发，防止误触，random生成随机数来返回随机信息
 bao = on_command('抱')
@@ -67,8 +71,8 @@ tietie = on_command('贴贴')
 @tietie.handle()
 async def handle_tietie():
     responses = ["啊......帽子！",
-                         "离我那么近......我，我可没有能完全保护你的自信！",
-                         "和博士贴贴~！"]
+                 "离我那么近......我，我可没有能完全保护你的自信！",
+                 "和博士贴贴~！"]
     msg = choice(responses)
     await tietie.finish(msg)
 
@@ -78,3 +82,61 @@ async def handle_xinzang():
     response = ["撒撒给呦~撒撒给呦~心脏~撒撒给呦~"]
     msg = choice(response)
     await xinzang.finish(msg)
+
+grass = on_keyword('草')
+@grass.handle()
+async def handle_grass():
+    response = ["一种植物。"]
+    msg = choice(response)
+    await grass.finish(msg)
+
+cao = on_keyword('艹')
+@cao.handle()
+async def handle_cao():
+    response = ["一种地形"]
+    msg = choice(response)
+    await cao.finish(msg)
+
+# --------以下信息用于对bot的戳一戳响应-------------
+
+# 记录上一次戳机器人的nickname
+last_notice_nickname = {}
+
+# 记录cd内再次戳之后的吐槽次数
+response = 0
+
+# poke_ban_list[群组id][QQ号]得到被封禁次数
+# 每次禁言默认事件*2^已经被封禁次数
+poke_ban_list = {}
+
+
+# 针对戳一戳
+chat_notice = on_notice(priority=1)
+
+
+@chat_notice.handle()
+async def handle_first_receive(bot: Bot, event: Event, state: T_State):
+    global last_notice_nickname
+    global response
+    try:
+        ids = event.get_session_id()
+    except:
+        pass
+    # 如果读取正常没有出错，因为有些notice格式不支持session
+    else:
+        # 如果这是一条群聊信息
+        if ids.startswith("group"):
+            _, group_id, user_id = event.get_session_id().split("_")
+            description = event.get_event_description()
+            values = json.loads(description.replace("'", '"'))
+            bot_id = "2133541714"
+            super_uid = ["2674367570"]
+            p_poke_response = 100
+            default_ban_time = 60
+            # 如果被戳的是机器人
+            if values['notice_type'] == 'notify' and values['sub_type'] == 'poke' and str(
+                    values['target_id']) == bot_id:
+                if user_id in super_uid:
+                    await chat_notice.finish("我爱你，博士")
+                else:
+                    await chat_notice.finish("我爱你，博士")
