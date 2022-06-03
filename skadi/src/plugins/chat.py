@@ -2,11 +2,11 @@ from ast import alias
 from random import choice
 import re
 from urllib import response
-from nonebot import on_keyword
+from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Bot, Event, Message
 
-#蒂蒂的聊天插件，采用keyword触发，random生成随机数来返回随机信息
-bao = on_keyword('抱')
+#蒂蒂的聊天插件，采用comman触发，防止误触，random生成随机数来返回随机信息
+bao = on_command('抱')
 @bao.handle()
 async def handle_bao():
     responses = ["离我那么近......我，我可没有能完全保护你的自信！",
@@ -15,7 +15,7 @@ async def handle_bao():
     msg = choice(responses)
     await bao.finish(msg)
 
-kiss = on_keyword('亲')
+kiss = on_command('亲亲')
 @kiss.handle()
 async def handle_kiss():
     responses = ["听你的。",
@@ -24,7 +24,7 @@ async def handle_kiss():
     msg = choice(responses)
     await kiss.finish(msg)
 
-love = on_keyword('爱')
+love = on_command('爱')
 @love.handle()
 async def handle_love():
     responses = ["你这人，怎么这么执着，这样我不就只能老老实实保护你了吗。",
@@ -33,28 +33,28 @@ async def handle_love():
     msg = choice(responses)
     await love.finish(msg)
 
-morning = on_keyword('早')
+morning = on_command('早')
 @morning.handle()
 async def handle_mornig():
     responses = ["早安，博士"]
     msg = choice(responses)
     await morning.finish(msg)
 
-night = on_keyword('晚')
+night = on_command('晚')
 @night.handle()
 async def handle_night():
     responses = ["睡着了？睡吧，博士，得做个干燥的好梦哟。"]
     msg = choice(responses)
     await night.finish(msg)
 
-what = on_keyword("干什么 干嘛")
+what = on_command("干什么",aliases={"干嘛"})
 @what.handle()
 async def handle_what():
     responses = ["我在等你，博士。我等你太久，太久了，我甚至已经忘了为什么要在这里等你......不过这些都不重要了。不再那么重要了。"]
     msg = choice(responses)
     await what.finish(msg)
 
-express = on_keyword("表白 告白")
+express = on_command("告白",aliases={"表白"})
 @express.handle()
 async def handle_express():
     responses = ["真，真的吗？",
@@ -63,7 +63,7 @@ async def handle_express():
     msg = choice(responses)
     await express.finish(msg)
 
-tietie = on_keyword('贴')
+tietie = on_command('贴贴')
 @tietie.handle()
 async def handle_tietie():
     responses = ["啊......帽子！",
@@ -72,7 +72,7 @@ async def handle_tietie():
     msg = choice(responses)
     await tietie.finish(msg)
 
-xinzang = on_keyword("献上心脏 献出心脏")
+xinzang = on_command("献上心脏", aliases={"献出心脏"})
 @xinzang.handle()
 async def handle_xinzang():
     response = ["撒撒给呦~撒撒给呦~心脏~撒撒给呦~"]
