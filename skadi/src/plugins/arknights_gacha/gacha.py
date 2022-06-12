@@ -121,12 +121,12 @@ def gacha_get_list(roll_times):
         elif s <= chance + RATIO_5_STARS + RATIO_4_STARS:
             total_count += 1
             save_count += 1
-            gachaList[0].append("★★★★    ")
+            gachaList[0].append("☆☆☆☆    ")
             gachaList[1].append(get_gacha_item(4))
         else:
             total_count += 1
             save_count += 1
-            gachaList[0].append("★★★      ")
+            gachaList[0].append("☆☆☆      ")
             gachaList[1].append(get_gacha_item(3))
     return gachaList
 
