@@ -28,7 +28,7 @@ async def handle_kiss():
     msg = choice(responses)
     await kiss.finish(msg)
 
-love = on_command('爱')
+love = on_command('爱',aliases={"我爱"})
 @love.handle()
 async def handle_love():
     responses = ["你这人，怎么这么执着，这样我不就只能老老实实保护你了吗。",
@@ -93,22 +93,21 @@ async def handle_grass():
 cao = on_keyword('艹')
 @cao.handle()
 async def handle_cao():
-    response = ["一种地形"]
+    response = ["一种地形。"]
     msg = choice(response)
     await cao.finish(msg)
+
+about = on_command("关于", aliases={"源码"})
+@about.handle()
+async def handle_about():
+    msg = "项目地址：https://github.com/yuyuziYYZ/skadi_bot"
+    await about.finish(msg)
+
 
 # --------以下信息用于对bot的戳一戳响应-------------
 
 # 记录上一次戳机器人的nickname
 last_notice_nickname = {}
-
-# 记录cd内再次戳之后的吐槽次数
-response = 0
-
-# poke_ban_list[群组id][QQ号]得到被封禁次数
-# 每次禁言默认事件*2^已经被封禁次数
-poke_ban_list = {}
-
 
 # 针对戳一戳
 chat_notice = on_notice(priority=1)
@@ -129,12 +128,8 @@ async def handle_first_receive(bot: Bot, event: Event, state: T_State):
             _, group_id, user_id = event.get_session_id().split("_")
             description = event.get_event_description()
             values = json.loads(description.replace("'", '"'))
-            bot_id = "123456789"
-            super_uid = ["123456789"]
+            bot_id = "2133541714"
             # 如果被戳的是机器人
             if values['notice_type'] == 'notify' and values['sub_type'] == 'poke' and str(
                     values['target_id']) == bot_id:
-                if user_id in super_uid:
-                    await chat_notice.finish("我爱你，博士")
-                else:
-                    await chat_notice.finish("我爱你，博士")
+                        await chat_notice.finish("我爱你，博士")

@@ -21,7 +21,7 @@ async def test():
                 message += matcher.__doc__ + "\n"
     message += (
         f"\n当前版本：v{__version__}\n"
-        "反馈&帮助群：\n"
-        "其余问题请加QQ："
+        "反馈&帮助群：144812758\n"
+        "其余问题请加QQ：2674367570"
     )
     await help.finish(message)

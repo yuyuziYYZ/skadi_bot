@@ -27,7 +27,7 @@ def create_env():
     while True:
         try:
             superusers = click.prompt(
-                "超级管理员QQ号，注意并非bot的QQ", default="", show_default=False
+                "2674367570", default="", show_default=False
             )
             superusers = [int(superuser) for superuser in superusers.split()]
             env["SUPERUSERS"] = superusers
