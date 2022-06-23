@@ -9,6 +9,8 @@ from nonebot.adapters.onebot.v11 import Bot, Message, Event, MessageSegment
 from nonebot.log import logger
 from nonebot.plugin import on_regex
 from nonebot import get_driver
+from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
+from nonebot.permission import SUPERUSER
 
 from .create_file import Config
 from .dao.group_dao import GroupDao
@@ -21,12 +23,12 @@ from .withdraw import add_withdraw_job
 setu = on_regex("^涩图$|^setu$|^无内鬼$|^色图$|^涩图tag.+$")
 downLoad = on_regex(r"^下载涩图[1-9]\d*$|^下载色图[1-9]\d*$")
 user_cd = on_regex(r"^\[CQ:at,qq=[1-9][0-9]{4,10}\] cd\d+$")
-group_cd = on_regex(r"^群cd0$|^群cd[1-9]\d*$")
+group_cd = on_regex(r"^群cd0$|^群cd[1-9]\d*$",permission=SUPERUSER | GROUP_OWNER)
 online_switch = on_regex(r"^开启在线发图$|^关闭在线发图$")
 proxy_switch = on_regex(r"^开启魔法$|^关闭魔法$")
 api = on_regex(r"^涩图api$|^设置api地址.+$")
-withdraw_interval = on_regex(r"^撤回间隔0$|^撤回间隔[1-9]\d*$")
-r18_switch = on_regex(r"^开启涩涩$|^关闭涩涩$|^开启私聊涩涩$|^关闭私聊涩涩$")
+withdraw_interval = on_regex(r"^撤回间隔0$|^撤回间隔[1-9]\d*$",permission=SUPERUSER | GROUP_OWNER)
+r18_switch = on_regex(r"^开启涩涩$|^关闭涩涩$|^开启私聊涩涩$|^关闭私聊涩涩$",permission=SUPERUSER | GROUP_OWNER)
 
 super_user = Config().super_users
 driver = get_driver()
@@ -109,7 +111,7 @@ async def _(bot: Bot, event: Event):
             logger.error(f'下载时出现异常{e}')
             await downLoad.send(str(e), at_sender=True)
     else:
-        await downLoad.send('只有主人才有权限哦', at_sender=True)
+        await downLoad.send('您没有权限', at_sender=True)
 
 
 def get_file_num(path):
@@ -122,36 +124,28 @@ def get_file_num(path):
 @user_cd.handle()
 async def _(bot: Bot, event: Event):
     msg = event.get_message()
-    user_id = event.get_user_id()
-    if user_id in super_user:
-        user_id = msg[0].get('data')['qq']
-        cd = int(event.get_plaintext().replace(' cd', ''))
-        user = UserDao().get_user_cd(user_id)
-        if user is None:
-            UserDao().add_user_cd(user_id, UserDao.datetime_to_seconds(datetime.now()), cd)
-        else:
-            UserDao().update_user_cd(user_id, '', cd)
-        await user_cd.send(f'设置用户{user_id}的cd成功,cd时间为{cd}s', at_sender=True)
+    user_id = msg[0].get('data')['qq']
+    cd = int(event.get_plaintext().replace(' cd', ''))
+    user = UserDao().get_user_cd(user_id)
+    if user is None:
+        UserDao().add_user_cd(user_id, UserDao.datetime_to_seconds(datetime.now()), cd)
     else:
-        await user_cd.send('只有主人才有权限哦', at_sender=True)
+        UserDao().update_user_cd(user_id, '', cd)
+    await user_cd.send(f'设置用户{user_id}的cd成功,cd时间为{cd}s', at_sender=True)
 
 
 @group_cd.handle()
 async def _(bot: Bot, event: Event):
     user_id = event.get_user_id()
-    if user_id in super_user:
-        cd = int(event.get_plaintext().replace('群cd', ''))
-        if not hasattr(event, 'group_id'):
-            await group_cd.send('请在群里使用', at_sender=True)
-        group_id = GroupDao().get_group_cd(event.group_id)
-        if group_id is None:
-            GroupDao().set_group_cd(event.group_id, cd)
-        else:
-            GroupDao().update_group_cd(event.group_id, cd)
-
-        await group_cd.send(f'设置群{event.group_id}的cd成功,cd时间为{cd}s', at_sender=True)
+    cd = int(event.get_plaintext().replace('群cd', ''))
+    if not hasattr(event, 'group_id'):
+        await group_cd.send('请在群里使用', at_sender=True)
+    group_id = GroupDao().get_group_cd(event.group_id)
+    if group_id is None:
+        GroupDao().set_group_cd(event.group_id, cd)
     else:
-        await group_cd.send('只有主人才有权限哦', at_sender=True)
+        GroupDao().update_group_cd(event.group_id, cd)
+    await group_cd.send(f'设置群{event.group_id}的cd成功,cd时间为{cd}s', at_sender=True)
 
 
 @online_switch.handle()
@@ -166,7 +160,7 @@ async def _(bot: Bot, event: Event):
                 json.dump(configs, f)
                 await online_switch.send(f'{msg}成功')
     else:
-        await online_switch.send('只有主人才有权限哦', at_sender=True)
+        await online_switch.send('您没有权限', at_sender=True)
 
 
 @proxy_switch.handle()
@@ -181,25 +175,21 @@ async def _(bot: Bot, event: Event):
                 json.dump(configs, f)
                 await proxy_switch.send(f'{msg}成功')
     else:
-        await proxy_switch.send('只有主人才有权限哦', at_sender=True)
+        await proxy_switch.send('您没有权限', at_sender=True)
 
 
 @withdraw_interval.handle()
 async def _(bot: Bot, event: Event):
     msg = event.get_plaintext()
     interval = int(msg.replace('撤回间隔', ''))
-    if event.get_user_id() in super_user:
-        if interval > 120:
+    if interval > 120:
             await withdraw_interval.send('间隔不能超过120s', at_sender=True)
-        else:
-            if not hasattr(event, 'group_id'):
-                await withdraw_interval.finish("请在群里使用此功能")
-            group_id = event.group_id
-            GroupDao().set_or_update_group_interval(group_id=group_id, interval=interval)
-            await withdraw_interval.send(f'设置群{group_id}撤回间隔{interval}s成功')
     else:
-        await withdraw_interval.send('只有主人才有权限哦', at_sender=True)
-
+        if not hasattr(event, 'group_id'):
+            await withdraw_interval.finish("请在群里使用此功能")
+        group_id = event.group_id
+        GroupDao().set_or_update_group_interval(group_id=group_id, interval=interval)
+        await withdraw_interval.send(f'设置群{group_id}撤回间隔{interval}s成功')
 
 @api.handle()
 async def _(bot: Bot, event: Event):
@@ -216,20 +206,17 @@ async def _(bot: Bot, event: Event):
             ImageDao().set_or_update_api(address)
             await api.send(f"设置api地址{address}成功")
         else:
-            await api.send("只有主人才有权限哦", at_sender=True)
+            await api.send("您没有权限", at_sender=True)
 
 
 @r18_switch.handle()
 async def _(bot: Bot, event: Event):
     msg = event.get_plaintext()
-    if event.get_user_id() in super_user:
-        if msg == "开启涩涩" or msg == "关闭涩涩":
-            if not hasattr(event, 'group_id'):
-                await r18_switch.finish('私聊请使用开启/关闭私聊涩涩')
-            GroupDao().set_or_update_group_r18(event.group_id, 1 if msg == "开启涩涩" else 0)
-            await r18_switch.finish(f"群{event.group_id}{msg}成功")
-        else:
-            UserDao().set_or_update_r18(1 if msg == "开启私聊涩涩" else 0)
-            await r18_switch.finish(f"{msg}成功")
+    if msg == "开启涩涩" or msg == "关闭涩涩":
+        if not hasattr(event, 'group_id'):
+            await r18_switch.finish('私聊请使用开启/关闭私聊涩涩')
+        GroupDao().set_or_update_group_r18(event.group_id, 1 if msg == "开启涩涩" else 0)
+        await r18_switch.finish(f"群{event.group_id}{msg}成功")
     else:
-        await r18_switch.finish('只有主人才有权限哦', at_sender=True)
+        UserDao().set_or_update_r18(1 if msg == "开启私聊涩涩" else 0)
+        await r18_switch.finish(f"{msg}成功")
