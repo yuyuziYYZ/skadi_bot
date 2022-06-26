@@ -103,7 +103,7 @@ async def _(bot: Bot, event: Event):
     num = int(re.search(r"\d+", event.get_plaintext()).group())
     if event.get_user_id() in super_user:
         try:
-            r18 = 1 if event.get_plaintext().find('色图') != -1 else 0
+            r18 = 0 # 因为极易查封，禁止r18
             await downLoad.send(f"开始下载...")
             await get_url(num=num, online_switch=0, tags="", r18=r18)
             await downLoad.send(f"下载涩图成功,图库中涩图数量{get_file_num('loliconImages')}", at_sender=True)
