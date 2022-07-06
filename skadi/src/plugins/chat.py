@@ -128,8 +128,8 @@ async def handle_first_receive(bot: Bot, event: Event, state: T_State):
             _, group_id, user_id = event.get_session_id().split("_")
             description = event.get_event_description()
             values = json.loads(description.replace("'", '"'))
-            bot_id = "2133541714"
+            bot_id = ["2133541714"]
             # 如果被戳的是机器人
             if values['notice_type'] == 'notify' and values['sub_type'] == 'poke' and str(
                     values['target_id']) == bot_id:
-                        await chat_notice.finish("我爱你，博士")
+                        await chat_notice.send("我爱你，博士",at_sender=True)

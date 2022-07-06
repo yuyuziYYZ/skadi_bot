@@ -1,6 +1,5 @@
 ﻿import random
 from pathlib import Path
-
 from nonebot import on_endswith, on_startswith
 from nonebot.adapters.onebot.v11 import GroupMessageEvent
 from nonebot.matcher import Matcher
@@ -19,7 +18,6 @@ def get_answers():
 
 answers_starts = on_startswith("翻看答案")
 answers_ends = on_endswith("翻看答案")
-
 @answers_starts.handle()
 @answers_ends.handle()
 async def answersbook(event: GroupMessageEvent, matcher: Matcher):
