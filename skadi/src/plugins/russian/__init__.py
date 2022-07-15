@@ -25,6 +25,7 @@ __plugin_usage__ = """俄罗斯轮盘帮助：
     结算：结算（当某一方120秒未开枪，可使用该命令强行结束对决并胜利）
     我的战绩：我的战绩
     排行榜：金币排行/胜场排行/败场排行/欧洲人排行/慈善家排行
+    获取每日金币：轮盘签到
     【注：同一时间群内只能有一场对决】
 """
 
@@ -155,7 +156,7 @@ async def _(
     if money > max_bet_gold:
         await russian.finish(f"太多了！单次金额不能超过{max_bet_gold}！", at_sender=True)
     if money > user_money:
-        await russian.finish("你没有足够的钱支撑起这场挑战", at_sender=True)
+        await russian.finish("你没有足够的钱支撑起这场挑战，请发送【蒂蒂轮盘签到】获取每日金币", at_sender=True)
 
     player1_name = event.sender.card or event.sender.nickname
 
